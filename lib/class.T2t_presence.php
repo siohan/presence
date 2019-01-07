@@ -165,7 +165,7 @@ function send_normal_email($sender, $recipient,$subject, $priority, $message)
                 }
 }
 
-//collecte les n° de licence des personnes ayant déjà répondues à une présence
+//collecte les genid des personnes ayant déjà répondues à une présence
 function relance_email_licence($id_presence)
 {
 	$db = cmsms()->GetDb();

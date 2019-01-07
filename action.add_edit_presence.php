@@ -30,8 +30,6 @@ if(isset($params['record_id']) && $params['record_id'] !="")
 		$edit = 1;//on est bien en train d'éditer un enregistrement
 		//ON VA CHERCHER l'enregistrement en question
 		$details = $insc_ops->details_presence($record_id);
-		var_dump($details);
-		
 }
 $gp_ops = new contact;
 $liste_groupes = $gp_ops->liste_groupes();

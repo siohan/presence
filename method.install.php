@@ -1,7 +1,7 @@
 <?php
 #-------------------------------------------------------------------------
 # Module: Presence
-# Version: 0.1, Claude SIOHAN
+# Version: 0.2, Claude SIOHAN
 # Method: Install
 #-------------------------------------------------------------------------
 # CMS - CMS Made Simple is (c) 2008 by Ted Kulp (wishy@cmsmadesimple.org)
