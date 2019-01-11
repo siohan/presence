@@ -10,7 +10,7 @@ if(!$this->CheckPermission('Presence use'))
 $db =& $this->GetDb();
 global $themeObject;
 $aujourdhui = date('Y-m-d');
-
+$pres_ops = new T2t_presence;
 if(isset($params['obj']) && $params['obj'] != '')
 {
 	$obj = $params['obj'];
@@ -21,6 +21,7 @@ else
 }
 switch($obj)
 {
+	//modifie une présence
 	case "activate_desactivate" :
 		$db = cmsms()->GetDb();
 		if(isset($params['record_id']) && $params['record_id'] != '')
@@ -43,5 +44,29 @@ switch($obj)
 		{
 			
 		}
+	break;
+	
+	case "reponse" :
+	
+		if(isset($params['id_presence']) && $params['id_presence'] != '')
+		{
+			$id_presence = $params['id_presence'];
+		}
+		if(isset($params['genid']) && $params['genid'] != '')
+		{
+			$genid = $params['genid'];			
+		}
+		if(isset($params['reponse']) && $params['reponse'] != '')
+		{
+			$reponse = $params['reponse'];			
+		}
+		$del_rep = $pres_ops->delete_reponse($id_presence, $genid);
+		if(true === $del_rep)
+		{
+			$add_rep = $pres_ops->add_reponse($id_presence, $genid, $reponse);
+		}
+		$this->Redirect($id, 'admin_reponses', $returnid, array("record_id"=>$id_presence));
+		
+	
 	break;
 }

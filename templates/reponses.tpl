@@ -22,6 +22,7 @@ $(document).ready(function(){
 //]]>
 </script>
 <h2>Liste des réponses pour : {$titre}</h2>
+<p>Cliquez sur les chevrons pour modifier les réponses</p>
 <div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound} &nbsp; {$add_edit}</p></div>
 {if $itemcount > 0}
 
@@ -29,14 +30,18 @@ $(document).ready(function(){
  <thead>
 	<tr>	
 		<th>Nom</th>	
-		<th>Réponse ?</th>
+		<th>Présent</th>
+		<th>Absent</th>
+		<th>Attente de réponse</th>
 	</tr>
  </thead>
  <tbody>
 {foreach from=$items item=entry}
   <tr class="{$entry->rowclass}">
-	<td>{$entry->genid}</td>
-	<td>{$entry->id_option}</td>
+	<td>{$entry->adherent}</td>
+	<td>{$entry->present}</td>
+	<td>{$entry->absent}</td>
+	<td>{$entry->attente}</td>
   </tr>
 {/foreach}
  </tbody>

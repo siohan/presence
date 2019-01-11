@@ -106,14 +106,59 @@ function has_expressed($id_presence, $genid)
 	{
 		if($dbresult->recordCount()>0)
 		{
-			$row = $dbresult->FetchRow();
-			$id_option = $row['id_option'];
-			return $id_option;
+			return true;
 		}
 		else
 		{
 			return false;
 		}
+	}
+	else
+	{
+		return false;
+	}
+}
+//récupère la réponse d'un adhérent
+function user_choice($id_presence, $genid)
+{
+	$db = cmsms()->GetDb();
+	$query = "SELECT id_option FROM ".cms_db_prefix()."module_presence_belongs WHERE id_presence = ? AND genid = ?";
+	$dbresult = $db->Execute($query, array($id_presence, $genid));
+	if($dbresult && $dbresult->recordCount()>0)
+	{
+		$row = $dbresult->fetchRow();
+		$id_option = $row['id_option'];
+		return $id_option;
+	}
+	else
+	{
+		return false;
+	}
+}
+//supprime une réponse d'un adhérent
+function delete_reponse($id_presence, $genid)
+{
+	$db = cmsms()->GetDb();
+	$query = "DELETE FROM ".cms_db_prefix()."module_presence_belongs WHERE id_presence = ? AND genid = ?";
+	$dbresult = $db->Execute($query, array($id_presence, $genid));
+	if($dbresult)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+//ajoute une réponse d'un adhérent à une présence donnée
+function add_reponse($id_presence, $genid, $reponse)
+{
+	$db = cmsms()->GetDb();
+	$query = "INSERT INTO ".cms_db_prefix()."module_presence_belongs (id_presence, genid, id_option) VALUES (?, ?, ?)";
+	$dbresult = $db->Execute($query, array($id_presence, $genid, $reponse));
+	if($dbresult)
+	{
+		return true;
 	}
 	else
 	{

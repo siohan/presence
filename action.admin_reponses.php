@@ -27,8 +27,7 @@ else
 }
 	
 $dbresult= array();
-//SELECT * FROM ping_module_ping_recup_parties AS rec right JOIN ping_module_ping_joueurs AS j ON j.licence = rec.licence  ORDER BY j.id ASC
-$query= "SELECT genid FROM ".cms_db_prefix()."module_adherents_groupes_belongs WHERE id_group = ?";//" ORDER BY date_debut DESC";
+$query= "SELECT genid FROM ".cms_db_prefix()."module_adherents_groupes_belongs WHERE id_group = ?";
 
 $dbresult= $db->Execute($query, array($groupe));
 $rowclass= 'row1';
@@ -44,24 +43,27 @@ if ($dbresult && $dbresult->RecordCount() > 0)
 		$onerow= new StdClass();
 		$onerow->rowclass= $rowclass;
 		$genid = $row['genid'];
-		$onerow->genid = $assoadh->get_name($row['genid']);
+		$onerow->adherent = $assoadh->get_name($genid);
 		$has_expressed = $pres_ops->has_expressed($record_id,$genid);
 		if(FALSE === $has_expressed)
 		{
-			$onerow->id_option= '';
-		//	$onerow->relance = $this->CreateLink($id, 'relance', $returnid, 'Relancer', array("genid"=>$row['genid'], "id_presence"=>$record_id));
+			$onerow->present= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'), '', '', 'systemicon'), array("obj"=>"reponse","genid"=>$row['genid'], "id_presence"=>$record_id, "reponse"=>"1"));
+			$onerow->absent= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'), '', '', 'systemicon'), array("obj"=>"reponse","genid"=>$row['genid'], "id_presence"=>$record_id, "reponse"=>"0"));
+			$onerow->attente= $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'), '', '', 'systemicon');
 		}
 		elseif($has_expressed == '1')
 		{
-			$onerow->id_option= $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'), '', '', 'systemicon');
-		//	$onerow->relance = $themeObject->DisplayImage('icons/extra/false.gif', $this->Lang('false'), '', '', 'systemicon');
+			$onerow->present= $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'), '', '', 'systemicon');
+			$onerow->absent= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'), '', '', 'systemicon'), array("obj"=>"reponse","genid"=>$row['genid'], "id_presence"=>$record_id, "reponse"=>"0"));
+			$onerow->attente= '';
 		}
 		elseif($has_expressed == '0')
 		{
-			$onerow->id_option= $themeObject->DisplayImage('icons/extra/false.gif', $this->Lang('false'), '', '', 'systemicon');
-		//	$onerow->relance = $themeObject->DisplayImage('icons/extra/false.gif', $this->Lang('false'), '', '', 'systemicon');
+			$onerow->present= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'), '', '', 'systemicon'), array("obj"=>"reponse","genid"=>$row['genid'], "id_presence"=>$record_id, "reponse"=>"1"));
+			$onerow->absent= $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'), '', '', 'systemicon');
+			$onerow->attente= '';		
 		}
-		
+	//	$onerow->edit= $this->CreateLink($id, 'edit_presence', $returnid,$themeObject->DisplayImage('icons/system/edit.gif', $this->Lang('edit'), '', '', 'systemicon'));
 	
 		$rowarray[]= $onerow;
       }

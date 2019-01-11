@@ -53,6 +53,8 @@ if($error < 1)
 	$dbresult = $db->Execute($query, array($id_presence, $genid));
 	$query = "INSERT INTO  ".cms_db_prefix()."module_presence_belongs(id_presence, id_option, genid) VALUES( ?, ?, ?)";
 	$dbresult = $db->Execute($query,array($id_presence, $reponse, $genid));
+	//on affiche le nom de ceux qui n'ont pas encore répondu !!
+	
 	if($dbresult)
 	{
 
