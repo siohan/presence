@@ -1,7 +1,3 @@
-{literal}<style>
-a {text-decoration: none; color: #ffffff;}
-</style>
-{/literal}
 <table width="100%" cellspacing="0" cellpadding="10" border="0"> 
 <tr colspan="2">
 <td>{$titre} {$description}</td>

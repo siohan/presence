@@ -26,7 +26,7 @@
 	<td>{$entry->date_debut|date_format:"%d-%m-%Y"} - {$entry->heure_debut}</td>
 	<td>{$entry->date_limite|date_format:"%d-%m-%Y"}</td>
 	<td>{$entry->actif}</td>
-	<th>{$entry->emailing}</td>
+	<td>{$entry->emailing} - {$entry->sms}</td>
 	<td>{$entry->inscrits}/{$entry->taux}</td>
 	<td>{$entry->editlink}</td> 
 	<td>{$entry->view}</td> 

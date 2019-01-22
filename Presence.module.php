@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------
 # Module : Presence - 
-# Version : 0.2, Sc
+# Version : 0.3, Sc
 # Auteur : Claude SIOHAN
 #-------------------------------------------------------------------------
 /**
@@ -20,7 +20,7 @@ class Presence extends CMSModule
   
   function GetName() { return 'Presence'; }   
   function GetFriendlyName() { return $this->Lang('friendlyname'); }   
-  function GetVersion() { return '0.2'; }  
+  function GetVersion() { return '0.3'; }  
   function GetHelp() { return $this->Lang('help'); }   
   function GetAuthor() { return 'Claude SIOHAN'; } 
   function GetAuthorEmail() { return 'claude.siohan@gmail.com'; }
@@ -41,7 +41,7 @@ class Presence extends CMSModule
   
   function GetDependencies()
   {
-	return array('Adherents'=>'0.3', 'Messages'=>'0.3');
+	return array('Adherents'=>'0.3', 'Messages'=>'0.3', 'Sms'=>'0.3');
   }
 
   
@@ -61,7 +61,8 @@ class Presence extends CMSModule
 	$this->SetParameterType('record_id', CLEAN_INT);
 	$this->SetParameterType('id_presence', CLEAN_INT);
 	$this->SetParameterType('licence', CLEAN_STRING);
-	
+	$this->SetParameterType('genid', CLEAN_INT);
+	$this->SetParameterType('reponse', CLEAN_INT);
 	
 	//form parameters
 	$this->SetParameterType('submit',CLEAN_STRING);

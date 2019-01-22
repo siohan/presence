@@ -17,8 +17,8 @@ if(isset($params['activetab']) && !empty($params['activetab']))
  }	
 	
 	echo $this->SetTabHeader('pres', 'Présences', ('pres' == $tab)?true:false);
-	echo $this->SetTabHeader('emails', 'Emails', ('emails' == $tab)?true:false);
-	echo $this->SetTabHeader('config', 'Config', ('config' == $tab)?true:false);	
+	echo $this->SetTabHeader('emails', 'Notifications', ('emails' == $tab)?true:false);
+	
 	echo $this->EndTabHeaders();
 
 	echo $this->StartTabContent();
@@ -29,11 +29,7 @@ if(isset($params['activetab']) && !empty($params['activetab']))
    	echo $this->EndTab();
 
 	echo $this->StartTab('emails', $params);
-	include(dirname(__FILE__).'/action.admin_emails_tab.php');
-   	echo $this->EndTab();
-
-	echo $this->StartTab('config', $params);
-	include(dirname(__FILE__).'/action.admin_config_tab.php');
+	include(dirname(__FILE__).'/action.admin_notifications_tab.php');
    	echo $this->EndTab();
 
 

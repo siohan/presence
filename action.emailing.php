@@ -74,8 +74,11 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 			//on extrait les utilisateurs (genid) du groupe sélectionné
 			//attention, on élimine les utilisateurs ayant déjà répondu
 			$licences = $pres_ops->relance_email_licence($id_presence);
-			var_dump($licences);
-			$tab = implode(', ',$licences);
+			if(is_array($licences) && count($licences) > 0 )
+			{
+				$tab = implode(', ',$licences);	
+			}
+		//	$tab = implode(', ',$licences);
 			$contacts_ops = new contact;
 			$adherents = $contacts_ops->UsersFromGroup($group_id);
 			$cg_ops = new CGExtensions;
@@ -133,6 +136,17 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 
 						$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $email_contact,$senttouser,$status, $ar);
 					}
+					else
+					{
+						//une erreur sur l'email, on fait quoi ?
+						//on indique l'erreur : pas d'email disponible !
+						$senttouser = 0;
+						$status = "Email absent";
+						$ar = 0;
+						$email_contact = "rien";
+						$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $email_contact,$senttouser,$status, $ar);
+						
+					}
 				}
 			}
 				
@@ -140,7 +154,7 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 			
 		
 		}
-		$this->SetMessage('Message envoyé !');
+		$this->SetMessage('Résultats des envois dans le module Asso Messages');
 		$this->RedirectToAdminTab('pres');
 	}
 	

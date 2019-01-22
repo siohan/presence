@@ -29,9 +29,10 @@ $lang['clt_mini'] = 'Indiquez le classement minimum requis en points pour pouvoi
 $lang['points_maxi'] = 'Indiquez le total des points maximum que cette équipe ne doit pas dépasser. 0 par défaut';
 $lang['help'] = '<h3>Que fait ce module ?</h3>
 <p>Ce module vous permet de gérer les absences/présences pour une manifestation, réunion, rencontres sportives, entrainements,etc..<br />
-Dans cette version, vous créer votre question et l\'envoi se fait par mail. Dans des versions ultérieures, il est prévu différents types d\'envois (SMS, messenger).</p>
-<p>Pour gérer les réponses, utilisez le tag suivant dans une de vos pages(merci de renseigner cet alias dans l\'onglet "Config") {cms_module module=Presence}</p>
-<ul>
+Dans cette version, vous créer votre question et l\'envoi se fait par mail et /ou par SMS. Dans des versions ultérieures, il est prévu différents types d\'envois (ex : messenger).</p>
+<p>Pour gérer les réponses, utilisez le tag suivant dans une de vos pages {cms_module module=Presence} et de renseigner cet alias dans l\'onglet "Notifications") </p>
+<h3>Paramètres Bitly</h3>
+<p>Bitly est un service tiers qui permet , entre autres de raccourcir vos urls, ce qui est très utile pour twitter et bien entendu pour les SMS</p><p>Il vous faudra créer un compte bitly (<a href="https://app.bitly.com/" target="_blank">bit.ly</a>) pour pouvoir raccourcir les urls dans vos SMS et ne pas dépasser les 160 caractères</p> <ul>
 <li>Pour obtenir la dernière version en cours (avant release officielle)
 <a href="https://github.com/siohan/presence">Version github</a>.</li>
 <li>L\'auteur peut aussi être contacté via skype sous le pseudo agiwebconseil.</li>

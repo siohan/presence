@@ -8,7 +8,8 @@ if (!$this->CheckPermission('Presence use'))
 }
 $db =& $this->GetDb();
 global $themeObject;
-
+$img_sms = '<img src="../modules/Presence/images/sms2.png"/>';
+$img_email = '<img src="../modules/Presence/images/email-16.png"/>';
 $smarty->assign('add_edit', 
 		$this->CreateLink($id, 'add_edit_presence', $returnid,$themeObject->DisplayImage('icons/system/add.gif', 'Ajouter', '', '', 'systemicon')));
 
@@ -43,7 +44,8 @@ if ($dbresult && $dbresult->RecordCount() > 0)
 	else
 	{
 		$onerow->actif= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'), '', '', 'systemicon'), array("obj"=>"activate_desactivate", "record_id"=>$row['id'], "act"=>"0"));
-		$onerow->emailing = $this->Createlink($id, 'emailing', $returnid, $themeObject->DisplayImage('icons/topfiles/cmsmailer.gif', 'Prévenir/Relancer', '', '', 'systemicon'), array("id_presence"=>$row['id']));
+		$onerow->emailing = $this->Createlink($id, 'emailing', $returnid, $img_email, array("id_presence"=>$row['id']));
+		$onerow->sms = $this->Createlink($id, 'admin_relance_sms', $returnid, $img_sms, array("id_presence"=>$row['id']));
 	}
 	
 	

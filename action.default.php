@@ -61,6 +61,10 @@ if($error < 1)
 	echo "Merci d'avoir répondu !!";
 
 	}
+	else
+	{
+		echo $db->ErrorMsg();
+	}
 }
 
 ?>

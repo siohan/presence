@@ -1,7 +1,7 @@
 <?php
 #-------------------------------------------------------------------------
 # Module: Presence
-# Version: 0.1
+# Version: 0.3
 # Method: Upgrade
 #-------------------------------------------------------------------------
 # CMS - CMS Made Simple is (c) 2008 by Ted Kulp (wishy@cmsmadesimple.org)
@@ -23,20 +23,32 @@ $dict = NewDataDictionary($db); 	/* @var $dict ADODB_DataDict */
  * After this, the code is identical to the code that would otherwise be
  * wrapped in the Upgrade() method in the module body.
  */
-$now = trim($db->DBTimeStamp(time()), "'");
+
 $current_version = $oldversion;
 switch($current_version)
 {
   // we are now 1.0 and want to upgrade to latest
  
 	
-	case "0.1" : 	
+	case "0.1" : 
+	case "0.2" :	
 	
 	{
-		$this->SetPreference('LastSendMessage', time());
-	}	
-	
-
+		//$this->SetPreference('LastSendMessage', time());
+		$fn = cms_join_path(dirname(__FILE__),'templates','orig_presencemailtemplate.tpl');
+		if( file_exists( $fn ) )
+		{
+			$template = file_get_contents( $fn );
+			$this->SetTemplate('presencemail_Sample',$template);
+		}
+		
+		$fn = cms_join_path(dirname(__FILE__),'templates','orig_smstemplate.tpl');
+		if( file_exists( $fn ) )
+		{
+			$template = file_get_contents( $fn );
+			$this->SetTemplate('sms_relance',$template);
+		}
+	}
 }
 // put mention into the admin log
 $this->Audit( 0, 
