@@ -45,6 +45,10 @@ $insc_ops = new T2t_presence;
 		{
 			$heure_debut = $params['heure_debut'];
 		}
+		else
+		{
+			$heure_debut = '1970-01-01';
+		}
 		if (isset($params['date_limite']) && $params['date_limite'] !='')
 		{
 			$date_limite = $params['date_limite'];

@@ -10,9 +10,6 @@ $db =& $this->GetDb();
 global $themeObject;
 $img_sms = '<img src="../modules/Presence/images/sms2.png"/>';
 $img_email = '<img src="../modules/Presence/images/email-16.png"/>';
-$smarty->assign('add_edit', 
-		$this->CreateLink($id, 'add_edit_presence', $returnid,$themeObject->DisplayImage('icons/system/add.gif', 'Ajouter', '', '', 'systemicon')));
-
 		
 $dbresult= array ();
 $query= "SELECT id,nom, description, date_debut, heure_debut,  date_limite, actif, groupe FROM ".cms_db_prefix()."module_presence_presence ORDER BY date_debut DESC";
@@ -44,8 +41,8 @@ if ($dbresult && $dbresult->RecordCount() > 0)
 	else
 	{
 		$onerow->actif= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'), '', '', 'systemicon'), array("obj"=>"activate_desactivate", "record_id"=>$row['id'], "act"=>"0"));
-		$onerow->emailing = $this->Createlink($id, 'emailing', $returnid, $img_email, array("id_presence"=>$row['id']));
-		$onerow->sms = $this->Createlink($id, 'admin_relance_sms', $returnid, $img_sms, array("id_presence"=>$row['id']));
+		$onerow->emailing = $this->Createlink($id, 'emailing', $returnid, $themeObject->DisplayImage('icons/topfiles/cmsmailer.gif', $this->Lang('cmsmailer'), '', '', 'systemicon'), array("id_presence"=>$row['id']));
+		$onerow->sms = $this->Createlink($id, 'admin_relance_sms', $returnid, 'SMS', array("id_presence"=>$row['id']));
 	}
 	
 	
@@ -58,8 +55,10 @@ if ($dbresult && $dbresult->RecordCount() > 0)
 	$onerow->inscrits = $insc_ops->count_users_in_presence($row['id']);
 	$onerow->taux = $nb_total;
 	$onerow->view= $this->CreateLink($id, 'admin_reponses', $returnid, $themeObject->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon'),array('record_id'=>$row['id']));
-	$onerow->print = $this->CreateLink($id, 'admin_print', $returnid,$themeObject->DisplayImage('icons/system/document-list.png', $this->Lang('print'), '', '', 'systemicon'), array("id_inscription"=>$row['id']));
+	$onerow->duplicate = $this->CreateLink($id, 'add_edit_presence', $returnid,$themeObject->DisplayImage('icons/system/copy.gif', $this->Lang('copy'), '', '', 'systemicon'), array("record_id"=>$row['id'], "edit"=>"0"));
 	$onerow->editlink= $this->CreateLink($id, 'add_edit_presence', $returnid, $themeObject->DisplayImage('icons/system/edit.gif', $this->Lang('edit'), '', '', 'systemicon'),array('record_id'=>$row['id']));
+	$onerow->delete= $this->CreateLink($id, 'presence', $returnid, $themeObject->DisplayImage('icons/system/delete.gif', $this->Lang('delete'), '', '', 'systemicon'),array('obj'=>'delete_presence','id_presence'=>$row['id']), $warn_message='Rien');
+	
 	($rowclass == "row1" ? $rowclass= "row2" : $rowclass= "row1");
 	$rowarray[]= $onerow;
       }

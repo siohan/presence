@@ -1,3 +1,2 @@
-{$titre} {$description}
-Présent=>{$oklien}
-Absent=>{$kolien}
+{$titre}
+Je réponds rapidos=>{$oklien}

@@ -7,38 +7,109 @@ if (!$this->CheckPermission('Presence use'))
 	return;
 }
 //debug_display($params, 'Parameters');
-if(isset($params['submit']))
+//debug_display($_POST, 'Parameters');
+if(!empty($_POST))
 {
-	//on sauvegarde ! Ben ouais !
-	$this->SetPreference('admin_email', $params['adminemail']);
-	$this->SetPreference('email_presence_subject', $params['emailpresencesubject']);
-	$this->SetTemplate('presencemail_Sample', $params['emailpresencebody']);
+	if( isset($_POST['cancel']) ) {
+            $this->RedirectToAdminTab();
+        }
+	if(isset($_POST['Date_Month']) && $_POST['Date_Month'] !='')
+	{
+		$Date_Month = $_POST['Date_Month'];
+	}
+	if(isset($_POST['Date_Day']) && $_POST['Date_Day'] !='')
+	{
+		$Date_Day = $_POST['Date_Day'];
+	}
+	if(isset($_POST['Date_Year']) && $_POST['Date_Year'] !='')
+	{
+		$Date_Year = $_POST['Date_Year'];
+	}
+	if(isset($_POST['Time_Hour']) && $_POST['Time_Hour'] !='')
+	{
+		$Time_Hour = $_POST['Time_Hour'];
+	}
+	if(isset($_POST['Time_Minute']) && $_POST['Time_Minute'] !='')
+	{
+		$Time_Minute = $_POST['Time_Minute'];
+	}
+	if(isset($_POST['Time_Second']) && $_POST['Time_Second'] !='')
+	{
+		$Time_Second = $_POST['Time_Second'];
+	}
+	else
+	{
+		$Time_Second = "00";
+	}
+	$LastSendNotification  = mktime($Time_Hour,$Time_Minute, $Time_Second,$Date_Month, $Date_Day,$Date_Year);
+	$result = $_POST['result'];
+	$unite = $_POST['unite'];
+	if($unite == 'Heures')
+	{
+		$coeff = 3600;
+	}
+	if($unite == 'Minutes')
+	{
+		$coeff = 60;
+	}
+	else
+	{
+		$coeff = 3600*24;
+	}
+	$dupli = $coeff*$result;
+	$this->SetPreference('LastSendNotification', $LastSendNotification);
+	$this->SetPreference('interval', $dupli);
 	
-	$this->SetPreference('sms_sender', $params['sms_sender']);
-	$this->SetPreference('bitly_client_id', $params['bitly_client_id']);
-	$this->SetPreference('bitly_client_secret', $params['bitly_client_secret']);
-	$this->SetPreference('bitly_access_token', $params['bitly_access_token']);
-	$this->SetTemplate('sms_relance', $params['sms_relance']);
-	$this->SetPreference('bitly_redirect_uri', $params['bitly_redirect_uri']);
 	//on redirige !
 	$this->RedirectToAdminTab('notifications');
+	
 }
-$smarty->assign('start_form', 
-		$this->CreateFormStart($id, 'admin_notifications_tab', $returnid));
-$smarty->assign('end_form', $this->CreateFormEnd ());
-$smarty->assign('pageid_presence', $this->CreateInputText($id, 'pageid_presence',$this->GetPreference('pageid_presence'), 50, 150));
-$smarty->assign('input_emailpresencesubject', $this->CreateInputText($id, 'emailpresencesubject',$this->GetPreference('email_presence_subject'), 50, 150));
-$smarty->assign('input_adminemail', $this->CreateInputText($id, 'adminemail',$this->GetPreference('admin_email'), 50, 150));
-$smarty->assign('emailpresencebody', $this->CreateSyntaxArea($id, $this->GetTemplate('presencemail_Sample'), 'emailpresencebody', '', '', '', '', 80, 7));
+else
+{
+	
+	//on recalcule la duplication pour le formulaire
+	$interval = (int) $this->GetPreference('interval');
+	$LastSendNotification = (int) $this->GetPreference('LastSendNotification');
+	//on calcule la date prévisionnelle de la prochaine collecte
+	$collecte = $LastSendNotification + $interval;
+	
+	$liste_unite = array('Minutes'=>'Minutes','Heures'=>'Heures', 'Jours'=>'Jours');
+	//on cherche à déterminer l'unité de l'interval (jours, heures ou minutes)
+	if(true == is_float($interval/86400))
+	{
+		//on met le résultat en heures
+		if(true == is_float($interval/3600))
+		{
+			$result = $interval/60;
+			$unite = 'Minutes';
+		}
+		else
+		{
+			$result = $interval/3600;
+			$unite = 'Heures';
+		}
+		
+	}
+	else
+	{
+		//on met le résultat en jours
+		$result = $interval/86400;
+		$unite = 'Jours';
+		
+	}
+	//on calcule la date prévisionnelle de la prochaine collecte
+	$collecte = $LastSendNotification + $interval;
+	$tpl = $smarty->CreateTemplate($this->GetTemplateResource('notifications.tpl'), null, null, $smarty);
+	$tpl->assign('LastSendNotification', $LastSendNotification);
+	$tpl->assign('liste_unite', $liste_unite);
+	$tpl->assign('result', $result);
+	$tpl->assign('unite', $unite);
+	$tpl->assign('interval', $this->GetPreference('interval'));
+	$tpl->assign('collecte', $collecte);
+	$tpl->display();
+}
 
-$smarty->assign('sms_sender', $this->CreateInputText($id, 'sms_sender',$this->GetPreference('sms_sender'), 50, 150));
-$smarty->assign('bitly_client_id', $this->CreateInputText($id, 'bitly_client_id',$this->GetPreference('bitly_client_id'), 50, 150));
-$smarty->assign('bitly_client_secret', $this->CreateInputText($id, 'bitly_client_secret',$this->GetPreference('bitly_client_secret'), 50, 150));
-$smarty->assign('bitly_access_token', $this->CreateInputText($id, 'bitly_access_token',$this->GetPreference('bitly_access_token'), 50, 150));
-$smarty->assign('bitly_redirect_uri', $this->CreateInputText($id, 'bitly_redirect_uri',$this->GetPreference('bitly_redirect_uri'), 50, 150));
-$smarty->assign('sms_relance', $this->CreateSyntaxArea($id, $this->GetTemplate('sms_relance'), 'sms_relance', '', '', '', '', 80, 7));
-$smarty->assign('submit', $this->CreateInputSubmit ($id, 'submit', $this->Lang('submit')));
-echo $this->ProcessTemplate('notifications.tpl');
+
 #
 # EOF
 #

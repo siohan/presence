@@ -10,7 +10,7 @@ class T2t_presence
 function details_presence($id_presence)
 {
 	$db = cmsms()->GetDb();
-	$query = "SELECT id,nom, description, date_debut, heure_debut, date_limite, actif, groupe FROM ".cms_db_prefix()."module_presence_presence WHERE id = ?";
+	$query = "SELECT id,nom, description, date_debut, heure_debut, date_limite, actif, groupe, group_notif FROM ".cms_db_prefix()."module_presence_presence WHERE id = ?";
 	$dbresult = $db->Execute($query, array($id_presence));
 	$details = array();
 	if($dbresult)
@@ -25,6 +25,7 @@ function details_presence($id_presence)
 			$details['date_limite'] = $row['date_limite'];
 			$details['actif'] = $row['actif'];
 			$details['groupe'] = $row['groupe'];
+			$details['group_notif'] = $row['group_notif'];
 		}
 	}
 		return $details;
@@ -32,12 +33,12 @@ function details_presence($id_presence)
 
 }
 //ajoute une inscription
-function add_presence($nom, $description, $date_debut,  $heure_debut, $date_limite, $actif, $groupe)
+function add_presence($nom, $description, $date_debut,  $heure_debut, $date_limite, $actif, $groupe, $group_notif)
 {
 	$db = cmsms()->GetDb();
 	$pres_ops = new T2t_presence;
-	$query = "INSERT INTO ".cms_db_prefix()."module_presence_presence (nom, description, date_debut, heure_debut, date_limite, actif, groupe) VALUES (?, ?, ?, ?, ?, ?, ?)";
-	$dbresult = $db->Execute($query, array($nom, $description, $date_debut, $heure_debut,$date_limite, $actif, $groupe));
+	$query = "INSERT INTO ".cms_db_prefix()."module_presence_presence (nom, description, date_debut, heure_debut, date_limite, actif, groupe, group_notif) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	$dbresult = $db->Execute($query, array($nom, $description, $date_debut, $heure_debut,$date_limite, $actif, $groupe, $group_notif));
 	if($dbresult)
 	{
 		return true;
@@ -49,11 +50,11 @@ function add_presence($nom, $description, $date_debut,  $heure_debut, $date_limi
 	}
 }
 ##
-function edit_presence($record_id,$nom, $description, $date_debut, $heure_debut, $date_limite, $actif, $groupe)
+function edit_presence($record_id,$nom, $description, $date_debut, $heure_debut, $date_limite, $actif, $groupe, $group_notif)
 {
 	$db = cmsms()->GetDb();
-	$query = "UPDATE ".cms_db_prefix()."module_presence_presence SET nom = ?, description = ?, date_debut = ?, heure_debut = ?, date_limite = ?,  actif = ?, groupe = ? WHERE id = ?";
-	$dbresult = $db->Execute($query, array($nom, $description, $date_debut, $heure_debut,$date_limite, $actif, $groupe, $record_id));
+	$query = "UPDATE ".cms_db_prefix()."module_presence_presence SET nom = ?, description = ?, date_debut = ?, heure_debut = ?, date_limite = ?,  actif = ?, groupe = ?, group_notif = ? WHERE id = ?";
+	$dbresult = $db->Execute($query, array($nom, $description, $date_debut, $heure_debut,$date_limite, $actif, $groupe, $group_notif, $record_id));
 	if($dbresult)
 	{
 		return true;
@@ -63,7 +64,22 @@ function edit_presence($record_id,$nom, $description, $date_debut, $heure_debut,
 		return false;
 	}
 }
-//active ou désactive une inscription
+//supprime une présence entièrement
+function delete_presence($id_presence)
+{
+	$db = cmsms()->GetDb();
+	$query = "DELETE FROM ".cms_db_prefix()."module_presence_presence WHERE id = ?";
+	$dbresult = $db->Execute($query, array($id_presence));
+	if($dbresult)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+//active ou désactive une présence
 function activate_desactivate_inscription($id_presence,$action)
 {
 	$db = cmsms()->GetDb();
@@ -92,7 +108,7 @@ function count_users_in_presence($id_presence)
 function delete_users_in_presence($id_presence)
 {
 	$db = cmsms()->GetDb();
-	$query = "DELETE FROM ".cms_db_prefix()."module_presence_belongs WHERE id_inscription = ?";
+	$query = "DELETE FROM ".cms_db_prefix()."module_presence_belongs WHERE id_presence = ?";
 	$dbresult = $db->Execute($query, array($id_presence));
 	
 }
@@ -154,8 +170,8 @@ function delete_reponse($id_presence, $genid)
 function add_reponse($id_presence, $genid, $reponse)
 {
 	$db = cmsms()->GetDb();
-	$query = "INSERT INTO ".cms_db_prefix()."module_presence_belongs (id_presence, genid, id_option) VALUES (?, ?, ?)";
-	$dbresult = $db->Execute($query, array($id_presence, $genid, $reponse));
+	$query = "INSERT INTO ".cms_db_prefix()."module_presence_belongs (id_presence, genid, id_option, timbre) VALUES (?, ?, ?, ?)";
+	$dbresult = $db->Execute($query, array($id_presence, $genid, $reponse, time()));
 	if($dbresult)
 	{
 		return true;
@@ -210,7 +226,7 @@ function send_normal_email($sender, $recipient,$subject, $priority, $message)
                 }
 }
 
-//collecte les genid des personnes ayant déjà répondues à une présence
+//collecte les genid des personnes ayant déjà répondues à une présence donnée
 function relance_email_licence($id_presence)
 {
 	$db = cmsms()->GetDb();

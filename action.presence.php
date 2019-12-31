@@ -21,7 +21,7 @@ else
 }
 switch($obj)
 {
-	//modifie une présence
+	//Active ou désactive une présence
 	case "activate_desactivate" :
 		$db = cmsms()->GetDb();
 		if(isset($params['record_id']) && $params['record_id'] != '')
@@ -38,14 +38,41 @@ switch($obj)
 		
 		$this->RedirectToAdminTab('pres');
 	break;
-	
-	case "delete" :
-		if(isset($params['record_id']) && $params['record_id'] != '')
+	//supprime la réponse d'un adhérent
+	case "delete_reponse" :
+		if(isset($params['id_presence']) && $params['id_presence'] != '')
 		{
-			
+			$id_presence = $params['id_presence'];
 		}
+		if(isset($params['genid']) && $params['genid'] != '')
+		{
+			$genid = $params['genid'];
+		}
+			$del_rep = $pres_ops->delete_reponse($id_presence, $genid);
+		
+		$this->Redirect($id, 'admin_reponses', $returnid, array("record_id"=>$id_presence));
 	break;
 	
+	//supprime la réponse d'un adhérent
+	case "delete_presence" :
+		if(isset($params['id_presence']) && $params['id_presence'] != '')
+		{
+			$id_presence = $params['id_presence'];
+		}
+		if(isset($params['genid']) && $params['genid'] != '')
+		{
+			$genid = $params['genid'];
+		}
+			$del_pres = $pres_ops->delete_presence($id_presence);
+			if(true === $del_pres)
+			{
+				$del_rep = $pres_ops->delete_users_in_presence($id_presence);
+			}
+			
+		
+		$this->Redirect($id, 'defaultadmin', $returnid);
+	break;
+	//ajoute ou modifie une réponse
 	case "reponse" :
 	
 		if(isset($params['id_presence']) && $params['id_presence'] != '')

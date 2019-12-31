@@ -7,24 +7,30 @@ if (!$this->CheckPermission('Presence use'))
 	return;
 }
 //debug_display($params, 'Parameters');
-if(isset($params['submit']))
+if(!empty($_POST))
 {
+	if( isset($_POST['cancel']) ) {
+            $this->RedirectToAdminTab();
+        }
 	//on sauvegarde ! Ben ouais !
-	$this->SetPreference('admin_email', $params['adminemail']);
-	$this->SetPreference('email_presence_subject', $params['emailpresencesubject']);
-	$this->SetTemplate('presencemail_Sample', $params['emailpresencebody']);
+	$this->SetPreference('pageid_presence', $_POST['pageid_presence']);
+	//$this->SetPreference('admin_email', $_POST['adminemail']);
+	$this->SetPreference('email_presence_subject', $_POST['emailpresencesubject']);
+	$this->SetTemplate('presencemail_Sample', $_POST['emailpresencebody']);
 	
 	//on redirige !
-	$this->RedirectToAdminTab('notifications');
+	$this->RedirectToAdminTab('emails');
+	
 }
-$smarty->assign('start_form', 
-		$this->CreateFormStart($id, 'admin_emails_tab', $returnid));
-$smarty->assign('end_form', $this->CreateFormEnd ());
-$smarty->assign('input_emailpresencesubject', $this->CreateInputText($id, 'emailpresencesubject',$this->GetPreference('email_presence_subject'), 50, 150));
-$smarty->assign('input_adminemail', $this->CreateInputText($id, 'adminemail',$this->GetPreference('admin_email'), 50, 150));
-$smarty->assign('emailpresencebody', $this->CreateSyntaxArea($id, $this->GetTemplate('presencemail_Sample'), 'emailpresencebody', '', '', '', '', 80, 7));
-$smarty->assign('submit', $this->CreateInputSubmit ($id, 'submit', $this->Lang('submit')));
-echo $this->ProcessTemplate('notifications.tpl');
+else
+{
+	$tpl = $smarty->CreateTemplate($this->GetTemplateResource('admin_emails.tpl'), null, null, $smarty);
+	$tpl->assign('pageid_presence', $this->GetPreference('pageid_presence'));
+	$tpl->assign('email_presence_subject', $this->GetPreference('email_presence_subject'));
+	$tpl->assign('presencemail_Sample', $this->GetTemplate('presencemail_Sample'));
+	$tpl->display();
+}
+
 #
 # EOF
 #

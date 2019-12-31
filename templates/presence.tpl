@@ -1,7 +1,7 @@
-<h2>Liste des Matchs/Entrainements/Etc..</h2>
-<div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound} &nbsp; {$add_edit}</p></div>
+<h2>Liste des présences</h2>
+<div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound}</p><p><a href="{module_action_url action=add_edit_presence}">{admin_icon icon='newobject.gif'} Ajouter une présence</a></div>
 {if $itemcount > 0}
-{$form2start}
+{*$form2start*}
 <table border="0" cellspacing="0" cellpadding="0" class="pagetable">
  <thead>
 	<tr>
@@ -13,7 +13,7 @@
 		<th>actif ?</th>
 		<th>Prévenir/Relancer</th>
 		<th>Réponses (taux)</th>
-		<th colspan="3">Action(s)</th>
+		<th colspan="4">Action(s)</th>
 		<!--<th><input type="checkbox" id="selectall" name="selectall"></th>-->
 	</tr>
  </thead>
@@ -29,8 +29,9 @@
 	<td>{$entry->emailing} - {$entry->sms}</td>
 	<td>{$entry->inscrits}/{$entry->taux}</td>
 	<td>{$entry->editlink}</td> 
+	<td>{$entry->duplicate}</td>
 	<td>{$entry->view}</td> 
-	<td>{$entry->print}</td> 
+	<td>{$entry->delete}</td> 
 <!--	<td><input type="checkbox" name="{$actionid}sel[]" value="{$entry->id}" class="select"></td>-->
   </tr>
 {/foreach}

@@ -39,12 +39,10 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 	
 	//on construit les liens à déployer
 	
-	$debut_url = 'http://ping.agi-webconseil.fr';//$config['root_url'];
 	
 	$retourid = $this->GetPreference('pageid_presence');//44;
-//	var_dump($retourid);
 	$page = $cg_ops->resolve_alias_or_id($retourid);//'presence';
-	$action_module = 'cntnt01';
+	
 	
 	
 
@@ -72,76 +70,102 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 			$adherents = $contacts_ops->UsersFromGroup($group_id);
 			$cg_ops = new CGExtensions;
 			require_once('bitly.php');
+			
+			//l'utilisateur a t-il déjà reçu une notification par sms ?
+			
+			
+			
 			foreach($adherents as $sels)
 			{
 				//avant on envoie dans le module emails pour tous les utilisateurs et sans traitement
 				if(FALSE === $licences || FALSE === in_array($sels, $licences))
 				{
-					$query = "SELECT contact FROM ".cms_db_prefix()."module_adherents_contacts WHERE genid = ? AND type_contact = 2 LIMIT 1";
-					$dbresult = $db->Execute($query, array($sels));
-					if($dbresult && $dbresult->RecordCount()>0)
-					{
-						$row = $dbresult->FetchRow();
-
-						$sms_contact = $row['contact'];
-						$destinataires = array();
-					
-						
-						if(!is_null($sms_contact))
+				
+						$query = "SELECT contact FROM ".cms_db_prefix()."module_adherents_contacts WHERE genid = ? AND type_contact = 2 LIMIT 1";
+						$dbresult = $db->Execute($query, array($sels));
+						if($dbresult && $dbresult->RecordCount()>0)
 						{
-							
-						
-							$lienok = $debut_url.'/index.php?page='.$retourid.'%26mact=Presence,'.$action_module.',default,0%26'.$action_module.'id_presence='.$id_presence.'%26'.$action_module.'genid='.$sels.'%26'.$action_module.'reponse=1';
-							$lienko = $debut_url.'/index.php?page='.$retourid.'%26mact=Presence,'.$action_module.',default,0%26'.$action_module.'id_presence='.$id_presence.'%26'.$action_module.'genid='.$sels.'%26'.$action_module.'reponse=0';//$this->CreateLink($id, 'default', $returnid, 'Absent', array("id_presence"=>$id_presence,"reponse"=>"0", "licence"=>$sels));
-						
-							$params1 = array();
-							$params1['access_token'] = $user_access_token;
-							$params1['longUrl'] = $lienok;
-							$resultsok = bitly_get('shorten', $params1, $complex=true);
-							$oklien = $resultsok['data']['url'];
-							$smarty->assign('oklien', $oklien);
-							$params2 = array();
-							$params2['access_token'] = $user_access_token;
-							$params2['longUrl'] = $lienko;
-							$resultsko = bitly_get('shorten', $params2, $complex=true);
-							$kolien = $resultsko['data']['url'];
-							$smarty->assign('kolien', $kolien);
-							$content = $this->ProcessTemplateFromData($message);
-							$sent = 0;
-							$add_message = $sms_ops->add_message($message_reference,$subtype, $senddate, $sendtime,$sender, $content, $richsms_option,$richsms_url);
-							if(true === $add_message)
-							{
-								$message_id = $db->Insert_ID();
-								$add_to_recipients = $sms_ops->add_recipients($message_id, $id_envoi='0', $sels,$sent,$sms_contact);
-							}
-							
-							//on construit le sms
-							//on appelle la biblio smsenvoi
-							$smsenv = new smsenvoi;
-							
-							if($smsenv->sendSMS($sms_contact,$content,'PREMIUM',$sender))
-							{
-									//ENVOI REUSSI
-									$success=true;
+							$row = $dbresult->FetchRow();
 
-									//Id de l'envoi effectué
-									//Idéalement, cet id devrait être stocké en base de données
-									$id_envoi=$smsenv->id;
-									//on met la bdd à jour
-									$maj_message = $sms_ops->maj_envoi($message_reference,$id_envoi);
-									$maj_recipients = $sms_ops->maj_recipients($message_id, $id_envoi);									
+							$sms_contact = $row['contact'];
+							$destinataires = array();
 
+
+							if(!is_null($sms_contact))
+							{
+
+
+								$lienok = $this->create_url($id,'default',$page, array("id_presence"=>$id_presence, "genid"=>$sels, "sms"=>"sms") );
+								//var_dump($lienok);
+								//$lienok = $debut_url.'/index.php?page='.$retourid.'%26mact=Presence,'.$action_module.',default,0%26'.$action_module.'id_presence='.$id_presence.'%26'.$action_module.'genid='.$sels.'%26'.$action_module.'reponse=1';
+								//$lienko = $debut_url.'/index.php?page='.$retourid.'%26mact=Presence,'.$action_module.',default,0%26'.$action_module.'id_presence='.$id_presence.'%26'.$action_module.'genid='.$sels.'%26'.$action_module.'reponse=0';//$this->CreateLink($id, 'default', $returnid, 'Absent', array("id_presence"=>$id_presence,"reponse"=>"0", "licence"=>$sels));
+
+								$params1 = array();
+								$params1['access_token'] = $user_access_token;
+								$params1['longUrl'] = urlencode($lienok);
+								$resultsok = bitly_get('shorten', $params1, $complex=true);
+								//var_dump($resultsok);
+								/*
+								if(!isset($resultsok['status_code']) || $resultsok['status_code'] != 500)
+								{
+									
+								}
+								*/
+								$oklien = $resultsok['data']['url'];
+								$smarty->assign('oklien', $oklien);
+								$montpl = $this->GetTemplateResource('orig_smstemplate.tpl');
+								//$montpl = $this->GetTemplate('sms_relance');
+												
+								$smarty = cmsms()->GetSmarty();
+								// do not assign data to the global smarty
+								$tpl = $smarty->createTemplate($montpl);
+								$tpl->assign('oklien',$oklien);
+								
+								$tpl->assign('titre',$titre);
+								$tpl->assign('description',$description);
+							 	$output = $tpl->fetch();
+								$sent = 0;
+								$add_message = $sms_ops->add_message($message_reference,$subtype, $senddate, $sendtime,$sender, $output, $richsms_option,$richsms_url);
+								if(true === $add_message)
+								{
+									$message_id = $db->Insert_ID();
+									$add_to_recipients = $sms_ops->add_recipients($message_id, $id_envoi='0', $sels,$sent,$sms_contact);
+								}
+
+								//on construit le sms
+								//on appelle la biblio smsenvoi
+								
+								$smsenv = new smsenvoi;
+
+								if($smsenv->sendSMS($sms_contact,$output,'PREMIUM',$sender))
+								{
+										//ENVOI REUSSI
+										$success=true;
+
+										//Id de l'envoi effectué
+										//Idéalement, cet id devrait être stocké en base de données
+										$id_envoi=$smsenv->id;
+										//on met la bdd à jour
+										$maj_message = $sms_ops->maj_envoi($message_reference,$id_envoi);
+										$maj_recipients = $sms_ops->maj_recipients($message_id, $id_envoi);									
+
+								}
+								
 							}
+							unset($oklien);
 						
-						
+
+
 						}
-						unset($oklien);
-						unset($kolien);
-						
 					
-					}
+					
+				}//fin du if
+				else
+				{
+					//on est dans le cas d'un renvoi de sms
 				}
-			}
+			}//fin du foreach
+			
 				
 				
 			

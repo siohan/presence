@@ -21,30 +21,24 @@ $(document).ready(function(){
 });
 //]]>
 </script>
-<h2>Liste des réponses pour : {$titre}</h2>
-<p>{$Revenir}</p>
-<p>Cliquez sur les chevrons pour modifier les réponses</p>
-<div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound} &nbsp; {$add_edit}</p></div>
+<h2>{$titre} : Liste des réponses</h2>
+
+
+<div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound} &nbsp;</p></div>
 {if $itemcount > 0}
 
-<table border="0" cellspacing="0" cellpadding="0" class="pagetable">
+<table class="table_bordered">
  <thead>
 	<tr>	
 		<th>Nom</th>	
-		<th>Présent</th>
-		<th>Absent</th>
-		<th>Attente de réponse</th>
-		<th>Action(s)</th>
+		<th>Présent/Absent</th>
 	</tr>
  </thead>
  <tbody>
 {foreach from=$items item=entry}
   <tr class="{$entry->rowclass}">
 	<td>{$entry->adherent}</td>
-	<td>{$entry->present}</td>
-	<td>{$entry->absent}</td>
-	<td>{$entry->attente}</td>
-	<td>{$entry->delete}</td>
+	<td>{$entry->reponse}</td>
   </tr>
 {/foreach}
  </tbody>

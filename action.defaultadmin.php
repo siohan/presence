@@ -9,15 +9,17 @@ if ( !isset($gCms) ) exit;
 //debug_display($params, 'Parameters');
 echo $this->StartTabheaders();
 
-if(isset($params['activetab']) && !empty($params['activetab']))
+if(isset($params['__activetab']) && !empty($params['__activetab']))
   {
-    $tab = $params['activetab'];
+    $tab = $params['__activetab'];
   } else {
   $tab = 'pres';
  }	
 	
 	echo $this->SetTabHeader('pres', 'Présences', ('pres' == $tab)?true:false);
-	echo $this->SetTabHeader('emails', 'Notifications', ('emails' == $tab)?true:false);
+	echo $this->SetTabHeader('emails', 'Emails', ('emails' == $tab)?true:false);
+	echo $this->SetTabHeader('sms', 'SMS', ('sms' == $tab)?true:false);
+	echo $this->SetTabHeader('notif', 'Notifications', ('notif' == $tab)?true:false);
 	
 	echo $this->EndTabHeaders();
 
@@ -29,6 +31,14 @@ if(isset($params['activetab']) && !empty($params['activetab']))
    	echo $this->EndTab();
 
 	echo $this->StartTab('emails', $params);
+	include(dirname(__FILE__).'/action.admin_emails_tab.php');
+   	echo $this->EndTab();
+
+	echo $this->StartTab('sms', $params);
+	include(dirname(__FILE__).'/action.admin_sms_tab.php');
+   	echo $this->EndTab();
+
+	echo $this->StartTab('notif', $params);
 	include(dirname(__FILE__).'/action.admin_notifications_tab.php');
    	echo $this->EndTab();
 

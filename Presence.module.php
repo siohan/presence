@@ -2,16 +2,14 @@
 
 #-------------------------------------------------------------------------
 # Module : Presence - 
-# Version : 0.3, Sc
-# Auteur : Claude SIOHAN
+# Version : 0.4, Sc
+# Auteur : AssoSimple, Claude SIOHAN
 #-------------------------------------------------------------------------
 /**
  *
  * @author Claude SIOHAN
  * @since 0.1
  * @version $Revision: 1 $
- * @modifiedby $LastChangedBy: Claude
- * @lastmodified $Date: 2017-03-26 11:56:16 +0200 (Mon, 28 Juil 2015) $
  * @license GPL
  **/
 
@@ -20,7 +18,7 @@ class Presence extends CMSModule
   
   function GetName() { return 'Presence'; }   
   function GetFriendlyName() { return $this->Lang('friendlyname'); }   
-  function GetVersion() { return '0.3'; }  
+  function GetVersion() { return '0.4'; }  
   function GetHelp() { return $this->Lang('help'); }   
   function GetAuthor() { return 'Claude SIOHAN'; } 
   function GetAuthorEmail() { return 'claude.siohan@gmail.com'; }
@@ -41,7 +39,7 @@ class Presence extends CMSModule
   
   function GetDependencies()
   {
-	return array('Adherents'=>'0.3', 'Messages'=>'0.3', 'Sms'=>'0.3');
+	return array('Adherents'=>'0.3.4.5', 'Messages'=>'0.3.1', 'Sms'=>'0.3.1');
   }
 
   
@@ -63,6 +61,8 @@ class Presence extends CMSModule
 	$this->SetParameterType('licence', CLEAN_STRING);
 	$this->SetParameterType('genid', CLEAN_INT);
 	$this->SetParameterType('reponse', CLEAN_INT);
+	$this->SetParameterType('recap', CLEAN_INT);
+	$this->SetParameterType('sms', CLEAN_STRING);
 	
 	//form parameters
 	$this->SetParameterType('submit',CLEAN_STRING);
@@ -73,7 +73,8 @@ class Presence extends CMSModule
 
 function InitializeAdmin()
 {
-  	$this->SetParameters();
+  	return parent::InitializeAdmin();
+	$this->SetParameters();
 	//$this->CreateParameter('pagelimit', 100000, $this->Lang('help_pagelimit'));
 }
 
@@ -86,7 +87,7 @@ public function HasCapability($capability, $params = array())
 public function get_tasks()
 {
    $obj = array();
-	//$obj[0] = new RecupAdherentsTask();
+	$obj[0] = new RecupPresenceTask();
  //  	$obj[0] = new sendTask();  
 	
 return $obj; 

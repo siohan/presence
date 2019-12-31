@@ -5,13 +5,14 @@ if (!$this->CheckPermission('Presence use'))
 	echo $this->ShowErrors($this->Lang('needpermission'));
 	return;
 }
-//debug_display($params, 'Parameters');
+debug_display($params, 'Parameters');
 if(isset($params['id_presence']) && $params['id_presence'] !='')
 {
 	$id_presence = $params['id_presence'];
 	$insc_ops = new T2t_presence;
 	$details = $insc_ops->details_presence($id_presence);
 	$titre = $details['nom'];
+	$description = $details['description'];
 	$smarty->assign('titre', $titre);
 	$error = 0;
 	
@@ -19,7 +20,7 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 	$sender = $this->GetPreference('admin_email');	
 	$priority = $params['priority'] = '1';
 	$subject = $this->GetPreference('email_presence_subject');
-	$message = $this->GetTemplate('presencemail_Sample');
+//	$message = $this->GetTemplate('presencemail_Sample');
 //	$body = $this->ProcessTemplateFromData($body);
 	$aujourdhui = time();
 	
@@ -41,14 +42,14 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 		$sendtime = date("H:i:s");
 	}
 	$mess_ops = new T2t_messages;
-	$time_envoi = $mess_ops->datetotimeunix($senddate, $sendtime);
+	$timbre = $mess_ops->datetotimeunix($senddate, $sendtime);
 
 	$sent = 1;
-	if($time_envoi > $aujourdhui)
+	if($timbre > $aujourdhui)
 	{
 		$sent = 0;
 	}
-
+	$priority = 1;
 	if($error >0)
 	{
 		//pas glop, des erreurs !
@@ -64,8 +65,8 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 		$recipients_number = $gp_ops->count_users_in_group($group_id);
 		$mess_ops = new T2t_messages;
 		$pres_ops = new T2t_presence;
-		$mess = $mess_ops->add_message($sender, $senddate, $sendtime, $replyto, $group_id,$recipients_number, $subject, $titre, $sent);
-		$message_id =$db->Insert_ID();
+	//	$mess = $mess_ops->add_message($sender, $senddate, $sendtime, $replyto, $group_id,$recipients_number, $subject, $titre, $sent,$priority,$timbre);
+	//	$message_id =$db->Insert_ID();
 		
 		
 		
@@ -108,22 +109,37 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 
 							$retourid = $this->GetPreference('pageid_presence');//44;
 							$page = $cg_ops->resolve_alias_or_id($retourid);//'presence';
+							$lienok = $this->create_url($id,'default',$page, array("id_presence"=>$id_presence, "reponse"=>"1","genid"=>$sels));
+							$lienko = $this->create_url($id,'default',$page, array("id_presence"=>$id_presence, "reponse"=>"0","genid"=>$sels));
+						//	$lien_recap = $this->create_url($id,'default',$page, array("id_presence"=>$id_presence, "recap"=>"1","genid"=>$sels));
+							$montpl = $this->GetTemplateResource('orig_presencemailtemplate.tpl');						
+							$smarty = cmsms()->GetSmarty();
+							
+							// do not assign data to the global smarty
+							$tpl = $smarty->createTemplate($montpl);
+							$tpl->assign('lienok',$lienok);
+							$tpl->assign('lienko',$lienko);
+						//	$tpl->assign('lien_recap',$lien_recap);
+							$tpl->assign('titre',$titre);
+							$tpl->assign('description',$description);
+						 	$output = $tpl->fetch();
+						
+							$cmsmailer = new \cms_mailer();
+							$cmsmailer->reset();
+							$cmsmailer->SetSMTPDebug($flag = TRUE);
+							$cmsmailer->AddAddress($email_contact);
+							$cmsmailer->IsHTML(true);
+							$cmsmailer->SetPriority($priority);
+							$cmsmailer->SetBody($output);
+							$cmsmailer->SetSubject($subject);
+							$cmsmailer->Send();
+					                if( !$cmsmailer->Send() ) 
+							{			
+					                    	return false;
+								//$mess_ops->not_sent_emails($message_id, $recipients);
+					                }
 
-							$action_module = 'cntnt01';
-							$lienok = $debut_url.'/index.php?page='.$page.'&mact=Presence,'.$action_module.',default,0&'.$action_module.'id_presence='.$id_presence.'&'.$action_module.'genid='.$sels.'&'.$action_module.'reponse=1';
-							//$lienok = $this->CreateFrontendLink($id,$returnid, 'default', $contents='Présent', array("id_presence"=>$id_presence,"reponse"=>"1", "licence"=>$sels));
-
-							$smarty->assign('lienok', $lienok);
-
-							$lienko = $debut_url.'index.php?page='.$page.'&mact=Presence,'.$action_module.',default,0&'.$action_module.'id_presence='.$id_presence.'&'.$action_module.'genid='.$sels.'&'.$action_module.'reponse=0';//$this->CreateLink($id, 'default', $returnid, 'Absent', array("id_presence"=>$id_presence,"reponse"=>"0", "licence"=>$sels));
-							$smarty->assign('lienko', $lienko);
-							$envoi = $pres_ops->send_email($sender, $email_contact,$subject, $priority, $lienok, $lienko);
-							if(FALSE === $envoi)
-							{
-								$mess_ops->not_sent_emails($message_id, $recipients);
-							}
-							unset($lienok);
-							unset($lienko);
+							
 						}
 						else
 						{
@@ -134,7 +150,7 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 							$email_contact = "rien";
 						}
 
-						$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $email_contact,$senttouser,$status, $ar);
+					//	$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $email_contact,$senttouser,$status, $ar);
 					}
 					else
 					{
@@ -144,7 +160,7 @@ if(isset($params['id_presence']) && $params['id_presence'] !='')
 						$status = "Email absent";
 						$ar = 0;
 						$email_contact = "rien";
-						$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $email_contact,$senttouser,$status, $ar);
+					//	$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $email_contact,$senttouser,$status, $ar);
 						
 					}
 				}

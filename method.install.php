@@ -35,33 +35,33 @@ $flds = "
 	id I(11) AUTO KEY,
 	nom C(255),
 	description C(255),
+	reponse1 C(150),
+	reponse2 C(150),
 	date_debut D,
 	date_limite D,
 	heure_debut T,
 	actif I(1) DEFAULT 0,
-	groupe I(2) DEFAULT 0";
+	groupe I(2) DEFAULT 0,
+	group_notif I(3) DEFAULT 0";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_presence_presence", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
 //
-// mysql-specific, but ignored by other database
-$taboptarray = array( 'mysql' => 'ENGINE=MyISAM' );
-
-
 
 $dict = NewDataDictionary( $db );
 
 // table schema description
 $flds = "
 	id I(11) AUTO KEY,
+	timbre I(11),
 	id_presence I(11),
 	id_option I(1),
-	genid I(11)";
+	genid I(11),
+	timbre I(11)";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_presence_belongs", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
 //
-// mysql-specific, but ignored by other database
-$taboptarray = array( 'mysql' => 'ENGINE=MyISAM' );
-
+	$sqlarray = $dict->CreateIndexSQL('unicite', cms_db_prefix().'module_presence_belongs', 'id_presence, genid');//, array('UNIQUE'));
+	$dict->ExecuteSQLArray($sqlarray);
 //Permissions
 $this->CreatePermission('Presence use', 'Utiliser le module Présence');
 $this->CreatePermission('Presence Set Prefs', 'Modifier les données du compte');
@@ -82,6 +82,12 @@ if( file_exists( $fn ) )
 	$template = file_get_contents( $fn );
 	$this->SetTemplate('relanceemail_Sample',$template);
 }
+$fn = cms_join_path(dirname(__FILE__),'templates','orig_smstemplate.tpl');
+if( file_exists( $fn ) )
+{
+	$template = file_get_contents( $fn );
+	$this->SetTemplate('sms_template',$template);
+}
 
 
 # Les préférences 
@@ -93,6 +99,8 @@ $this->SetPreference('bitly_client_id', '');
 $this->SetPreference('bitly_client_secret', '');
 $this->SetPreference('bitly_access_token', '');
 $this->SetPreference('bitly_redirect_uri', '');
+$this->SetPreference('LastSendNotification', time());
+$this->SetPreference('interval', '300');
 // put mention into the admin log
 $this->Audit( 0, 
 	      $this->Lang('friendlyname'), 

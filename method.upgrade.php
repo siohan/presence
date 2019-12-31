@@ -49,6 +49,34 @@ switch($current_version)
 			$this->SetTemplate('sms_relance',$template);
 		}
 	}
+	
+	case "0.3" : 
+	{
+		
+		
+		$sqlarray = $dict->AddColumnSQL(cms_db_prefix()."module_presence_presence", "reponse1 C(150), reponse2 C(150)");
+		$dict->ExecuteSQLArray($sqlarray);
+				
+		$sqlarray = $dict->AddColumnSQL(cms_db_prefix()."module_presence_belongs", "timbre I(11)");
+		$dict->ExecuteSQLArray( $sqlarray );
+		
+		$now = time() - 3600*24;
+		$query = "UPDATE ".cms_db_prefix()."module_presence_belongs SET timbre = ?";
+		$db->Execute($query, array($now));
+		$this->SetPreference('LastSendNotification', time());
+	}
+	case "0.3.1":
+	{
+		$sqlarray = $dict->AddColumnSQL(cms_db_prefix()."module_presence_belongs", "timbre I(11)");
+		$dict->ExecuteSQLArray( $sqlarray );
+		
+		$sqlarray = $dict->AddColumnSQL( cms_db_prefix()."module_presence_presence", "group_notif I(3)");
+		$dict->ExecuteSQLArray($sqlarray);
+		
+		$sqlarray = $dict->CreateIndexSQL('unicite', cms_db_prefix().'module_presence_belongs', 'id_presence, genid');//, array('UNIQUE'));
+		$dict->ExecuteSQLArray($sqlarray);
+		$this->SetPreference('interval', '300');
+	}
 }
 // put mention into the admin log
 $this->Audit( 0, 
